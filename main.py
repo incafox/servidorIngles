@@ -57,7 +57,7 @@ def register():
 def registrar_curso():
     tutor = request.json['tutor']
     nombrecurso = request.json['name']
-    descripcion = request.json['password']
+    descripcion = request.json['descripcion']
     db_cursos.insert({
             'tutor': tutor,
             'nombrecurso': nombrecurso,
