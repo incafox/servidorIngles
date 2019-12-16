@@ -8,7 +8,6 @@ from flask_cors import CORS, cross_origin
 #BASE DE DATOS GENERAL PARA ALUMNOS (SOLO REGISTRO)
 db_alumnos_general = TinyDB('alumnos.json')
 
-
 #BASE DE DATOS CURSOS - IMPORTANTE
 db_cursos = TinyDB('cursos.json')
 
@@ -18,10 +17,6 @@ app = Flask(__name__) #create the Flask app
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 #CORS(app)
 
-@app.route('/query-example')
-def query_example():
-    return 'gaaaa'
-
 @app.route('/form-example')
 def formexample():
     return 'gaaaa'
@@ -30,9 +25,7 @@ def formexample():
 def jsonexample():
     return 'Todo...'
 
-
-
-@app.route('/login', methods=['POST'])
+@app.route('/login-dashboard', methods=['POST'])
 def login_page():
     
     userd = request.json['username']
