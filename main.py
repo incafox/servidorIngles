@@ -17,7 +17,7 @@ app = Flask(__name__) #create the Flask app
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 #CORS(app)
 
-@app.route('/form-example')
+@app.route('/')
 def formexample():
     return 'gaaaa'
 
@@ -52,22 +52,33 @@ def register():
             'password': passw  })
     pass
 
-
+#INSTRUCTOR
 @app.route('/registrarcurso', methods=['POST'])
 def registrar_curso():
     tutor = request.json['tutor']
     nombrecurso = request.json['name']
     descripcion = request.json['password']
+    db_cursos.insert({
+            'tutor': tutor,
+            'nombrecurso': nombrecurso,
+            'descripcion': descripcion })
+    return "registrado"
+    """
     #GRABA EN BASE DE DATOS
-    if ( db_alumnos_general.search(Consulta.name == nombrecurso) ):
+    if ( db_cursos.search(Consulta.name == nombrecurso) ):
         return "existe"
     else : #si no existe 
-        db_alumnos_general.insert({
+        db_cursos.insert({
             'tutor': tutor,
             'nombrecurso': nombrecurso,
             'descripcion': descripcion })
         return "registrado"
-		
+		"""
+#ALUMNO
+@app.route('/getcursos-student')
+def get_cursos_student():
+    return jsonify(db_cursos.all())
+
 
 #PARA ALUMNOS
 @app.route('/registrarcurso', methods=['POST'])
