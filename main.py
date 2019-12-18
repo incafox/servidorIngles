@@ -11,15 +11,12 @@ db_alumnos_general = TinyDB('alumnos.json')
 #BASE DE DATOS CURSOS - IMPORTANTE
 db_cursos = TinyDB('cursos.json')
 
+db_inscripciones = TinyDB('inscripciones.json')
 Consulta = Query()
 
 app = Flask(__name__) #create the Flask app
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 #CORS(app)
-
-@app.route('/')
-def formexample():
-    return 'gaaaa'
 
 @app.route('/json-example')
 def jsonexample():
@@ -80,6 +77,8 @@ def get_cursos_student():
     return jsonify(db_cursos.all())
 
 
+
+
 #PARA ALUMNOS
 @app.route('/registrarcurso', methods=['POST'])
 def registrarse_encurso():
@@ -97,6 +96,23 @@ def registrarse_encurso():
         return "registrado"
 
 
+#PARA ALUMNOS
+@app.route('/inscribirse', methods=['POST'])
+def inscribirse():
+    nombrecurso = request.json['name']
+    descripcion = request.json['password']
+    #GRABA EN BASE DE DATOS
+    if ( db_alumnos_general.search(Consulta.name == nombrecurso) ):
+        return "existe"
+    else : #si no existe 
+        db_alumnos_general.insert({
+            'tutor': tutor,
+            'nombrecurso': nombrecurso,
+            'descripcion': descripcion })
+        return "registrado"
+
+
+
 #PARA MAESTRO
 #retorna sus cursos
 @app.route('/getcursos/<string:maestro>',)
@@ -110,7 +126,6 @@ def cursos_instructor(maestro):
 def alumnosporcurso(maestro):
     #GRABA EN BASE DE DATOS
     return (db_alumnos_general.search(Consulta.name == maestro) )
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000) #run app in debug mode on port 5000
