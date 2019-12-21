@@ -38,6 +38,7 @@ def login_student():
     user = temp['email']
     pasw = temp['password']
     if (user == userd and pasw == passw):
+        #retorna
         return (infor_admin_json)
     else:
         return False#db.col_admin.find_one({"email": userd})
