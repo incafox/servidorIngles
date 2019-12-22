@@ -142,4 +142,4 @@ def alumnosporcurso(maestro):
     #return (db_alumnos_general.search(Consulta.name == maestro) )
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000) #run app in debug mode on port 5000
+    app.run(debug=True, port=8000) #run app in debug mode on port 5000
