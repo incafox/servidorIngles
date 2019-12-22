@@ -28,7 +28,6 @@ def jsonexample():
 
 #LOGIN SECTION
 @app.route('/login-student', methods=['POST'])
-
 def login_student():    
     userd = request.json['email']
     passw = request.json['password']
@@ -36,12 +35,12 @@ def login_student():
     #print (request.json)
     temp = col_student.find_one({"email": userd})
     user = temp['email']
-    pasw = temp['password']
+    pasw = temp['clave']
     if (user == userd and pasw == passw):
-        #retorna
-        return (infor_admin_json)
+        #retorna   
+        return "yes"
     else:
-        return False#db.col_admin.find_one({"email": userd})
+        return "no"#db.col_admin.find_one({"email": userd})
 
 @app.route('/login-instructor', methods=['POST'])
 def login_instructor():  
@@ -51,10 +50,10 @@ def login_instructor():
     #print (request.json)
     temp = col_instructor.find_one({"email": userd})
     user = temp['email']
-    pasw = temp['password']
+    pasw = temp['clave']
     if (user == userd and pasw == passw):
         #pasa a pedir informacion al server sobre todo lo relacionado 
-        return (infor_admin_json)
+        return True
     else:
         return False#db.col_admin.find_one({"email": userd})
 
@@ -66,7 +65,7 @@ def login_admin():
     #print (request.json)
     temp = col_admin.find_one({"email": userd})
     user = temp['email']
-    pasw = temp['password']
+    pasw = temp['clave']
     if (user == userd and pasw == passw):
         return (infor_admin_json)
     else:
