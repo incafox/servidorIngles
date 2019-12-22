@@ -34,12 +34,13 @@ def login_student():
     #revisa server
     #print (request.json)
     temp = col_student.find_one({"email": userd})
-    user = temp['email']
-    pasw = temp['clave']
-    if (user == userd and pasw == passw):
-        #retorna   
-        return "yes"
-    else:
+    try:
+        user = temp['email']
+        pasw = temp['clave']
+        if (user == userd and pasw == passw):
+            #retorna   
+            return "yes"
+    except:
         return "no"#db.col_admin.find_one({"email": userd})
 
 @app.route('/login-instructor', methods=['POST'])
