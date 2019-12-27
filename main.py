@@ -50,13 +50,16 @@ def login_instructor():
     #revisa server
     #print (request.json)
     temp = col_instructor.find_one({"email": userd})
-    user = temp['email']
-    pasw = temp['clave']
-    if (user == userd and pasw == passw):
-        #pasa a pedir informacion al server sobre todo lo relacionado 
-        return True
-    else:
-        return False#db.col_admin.find_one({"email": userd})
+    try:
+        user = temp['email']
+        pasw = temp['clave']
+        if (user == userd and pasw == passw):
+            #retorna   
+            return "yes"
+    except:
+        return "no"#db.col_admin.find_one({"email": userd})
+
+
 
 @app.route('/login-admin', methods=['POST'])
 def login_admin():
@@ -64,13 +67,15 @@ def login_admin():
     passw = request.json['password']
     #revisa server
     #print (request.json)
-    temp = col_admin.find_one({"email": userd})
-    user = temp['email']
-    pasw = temp['clave']
-    if (user == userd and pasw == passw):
-        return (infor_admin_json)
-    else:
-        return False#db.col_admin.find_one({"email": userd})
+    temp = col_student.find_one({"email": userd})
+    try:
+        user = temp['email']
+        pasw = temp['clave']
+        if (user == userd and pasw == passw):
+            #retorna   
+            return "yes"
+    except:
+        return "no"#db.col_admin.find_one({"email": userd})
 
 
 @app.route('/register', methods=['POST'])
