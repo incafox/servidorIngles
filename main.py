@@ -67,7 +67,7 @@ def login_admin():
     passw = request.json['password']
     #revisa server
     #print (request.json)
-    temp = col_student.find_one({"email": userd})
+    temp = col_admin.find_one({"email": userd})
     try:
         user = temp['email']
         pasw = temp['clave']
