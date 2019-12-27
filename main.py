@@ -15,7 +15,7 @@ db = myclient["ilaof"]  #crea base de datos
 col_admin = db["admin"]
 col_student = db["student"]
 col_instructor = db["instructor"]
-
+col_cursos = db["cursos"]
 
 app = Flask(__name__) #create the Flask app
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -24,6 +24,25 @@ cors = CORS(app, resources={r"/*": {"origins": "*"}})
 @app.route('/json-example')
 def jsonexample():
     return 'Todo...'
+
+
+"""==============="""
+"""SECCION ALUMNO"""
+"""==============="""
+
+#CREA CUENTA
+@app.route('/student-api-registerstudent', methods=['POST'])
+def register_student():    
+    userd = request.json['email']
+    named = request.json['name']
+    passw = request.json['password']
+    #revisa server
+    #print (request.json)
+    if (col_student.find_one({"email": userd})):
+        return "none"
+    else:
+        col_student.insert({"email": userd})
+    
 
 
 #LOGIN SECTION
@@ -43,6 +62,12 @@ def login_student():
     except:
         return "no"#db.col_admin.find_one({"email": userd})
 
+
+"""==============="""
+"""SECCION MAESTRO"""
+"""==============="""
+
+
 @app.route('/login-instructor', methods=['POST'])
 def login_instructor():  
     userd = request.json['email']
@@ -60,6 +85,21 @@ def login_instructor():
         return "no"#db.col_admin.find_one({"email": userd})
 
 
+@app.route('/instructor-api-registercurso', methods=['POST'])
+def register_curso():  
+    nombrecurso = request.json['nombrecurso']
+    nombretutor = request.json['nombretutor']
+    descripcion = request.json['descripcion']
+    
+    #revisa server
+    #print (request.json)
+    col_cursos.insert({ "nombrecurso": nombrecurso, "nombretutor": nombretutor, "descripcion":descripcion, "status": "false"})
+    pass
+
+
+"""==============="""
+"""SECCION ADMIN"""
+"""==============="""
 
 @app.route('/login-admin', methods=['POST'])
 def login_admin():
@@ -77,14 +117,26 @@ def login_admin():
     except:
         return "no"#db.col_admin.find_one({"email": userd})
 
-
-@app.route('/register', methods=['POST'])
-def register():
-    email = request.json['email']
-    name = request.json['name']
-    passw = request.json['password']
-    #GRABA EN BASE DE DATOS
+#EL ALUMNO SE REGISTRA SOLO LUEGO EL ADMIN SE ENCARGA DE ACTIVARLO LUEGO DEL PAGO
+@app.route('/admin-api-activatestudent', methods=['POST'])
+def addstudent():
     pass
+
+@app.route('/admin-api-activatecurso', methods=['POST'])
+def activatecurso():
+    pass
+
+@app.route('/admin-api-eliminatecurso', methods=['POST'])
+def eliminatecurso():
+    pass
+
+@app.route('/admin-api-blockstudent', methods=['POST'])
+def blockstudent():
+    pass
+
+
+
+
 
 #INSTRUCTOR
 @app.route('/registrarcurso', methods=['POST'])
