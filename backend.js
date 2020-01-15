@@ -1,3 +1,5 @@
+// 0 a 18 niveles >> 4 modulos >> 4 clases >> dif actividades
+
 // import express (after npm install express)
 const express = require('express');
 var MongoClient = require('mongodb').MongoClient
@@ -32,7 +34,78 @@ const adminSchema = new mongoose.Schema({
 }, {collection: 'admin'}); //buscan en ntal coleccion
 
 var admin = mongoose.model('admin', adminSchema);
-  
+ 
+////====================
+/////LOS ESQUEMAS FINALES
+///=====================
+//NOVEL >> MODULO >> CLASE
+
+
+//actividad
+//general nivel >> modulo >> clase
+
+// "niveles" : [{modulo},{modulo} .... ]
+// "modulo" : [{clase},{clase}, ... ]
+// "clase" : [{actividad1},{actividad1}]  //una actidad por ahora
+// "actividad" : varios tipos de actividades para cada pregunta
+// "actividad" :{tipo : "ordenar", }
+
+//plan solo un tipo de actividad, dicha actividad
+//ya tendra todos los espacions necesatios
+// ya en react haces un solo js para 
+//  que interprete el json de acuerdo al tipo "switch"
+//"actividad"   >> ESQUEMA 
+const actividadSchema = new mongoose.Schema({
+  tipo: {type: String},
+  sentencia: {type: String},
+  sentenciacorrecta :{type: String},
+},); //buscan en ntal coleccion
+var actividad = mongoose.model('actividad', actividadSchema);
+//============
+
+const claseSchema = new mongoose.Schema({
+  nombre: {type: String},
+  actividades: [actividadSchema]
+},); //buscan en ntal coleccion
+var clase = mongoose.model('clase', claseSchema);
+
+const moduloSchema = new mongoose.Schema({
+  nombre: {type: String},
+  actividades: [claseSchema]
+},); //buscan en ntal coleccion
+var modulo = mongoose.model('modulo', moduloSchema);
+
+
+const nivelSchema = new mongoose.Schema({
+  nombre: {type: String},
+  actividades: [claseSchema]
+},); //buscan en ntal coleccion
+var modulo = mongoose.model('nivel', nivelSchema);
+
+
+//ESQUEMA CURSO
+const cursoSchema = new mongoose.Schema({
+  nombre: {type: String},
+  instructor: {type : String},
+  curricula: []
+}, {collection: 'cursos'}); //buscan en ntal coleccion
+var curso = mongoose.model('curso', cursoSchema);
+//========================
+
+
+//ESQUEMA USUARIO
+const userSchema = new mongoose.Schema({
+  email: {type: String},
+  clave: {type: String},
+  direccion: {type: String},
+  fullname: {type: String},
+  telefono: {type: String},
+  tipo: {type: String},  //student, instructor, admin
+  //cursos: [curso],
+}, {collection: 'users'}); //buscan en ntal coleccion
+var user = mongoose.model('user', userSchema);
+//==========================
+//==========================
 
 async function run(user,pass, modelo) {
   await mongoose.connect('mongodb://localhost:27017/ilaof', { useNewUrlParser: true });
@@ -101,20 +174,48 @@ app.post('/login-main',async function(req,res) {
   console.log(req.body);
   var user_name=req.body.email;
   var password=req.body.password;
-
-  console.log("username : " + user_name);
-  console.log("password : " + password);
-  const g =  run(user_name, password, instructor);
-  let final = await g;
-
-  const g2 =  run(user_name, password, admin);
-  let final2 = await g2;
-
-  const g3 =  run(user_name, password, student);
-  let final3 = await g3;
-
-  console.log(final.length,final2.length,final3.length);
-  //console.log(final);
+  //console.log("username : " + user_name);
+  //console.log("password : " + password);
+  var temporal = { "email": user_name, "clave": password}
+  mongoose.connect('mongodb://localhost:27017/ilaof', { useNewUrlParser: true });
+  const docs = await user.find({"email":user_name});
+  let temp = await docs;
+  
+  //res.send(temp);
+  if (temp.length==0)
+  {
+    res.send("usuario no existe"); 
+  }
+  else
+  {
+    console.log(temp)
+    console.log(temp[0].tipo)
+      if (temp.clave===password)
+      {
+        /*
+        switch (temp[0].tipo) {
+          case "instructor":
+            res.send("instructor");
+            break;
+          case "admin":
+            res.send("admin");
+            break;
+          case "student":
+            res.send("student");
+          
+            break;
+          default:
+            break;
+        }*/
+        res.send(temp[0].tipo)
+      }
+      else
+      {
+        res.send("fallido");
+      }
+  }
+  
+  /*
   if (final.length>0)
   {
     //console.log(final);
@@ -138,6 +239,11 @@ app.post('/login-main',async function(req,res) {
     }
     //res.send("no");
   }
+  */
+
+
+
+
 });
 
 
@@ -182,10 +288,10 @@ app.post('/admin-matricula', async function(req,res) {
     var fullname = req.body.fullname;
     var telefono = req.body.telefono;
     var direccion = req.body.direccion;
-    //var password = req.body.password;
+    var password = req.body.clave;
     let temporal = {
       "email": email,
-      //"password": password,
+      "clave": password,
       "fullname": fullname,
       "telefono": telefono,
       "direccion": direccion,
@@ -193,29 +299,15 @@ app.post('/admin-matricula', async function(req,res) {
     }
 
     mongoose.connect('mongodb://localhost:27017/ilaof', { useNewUrlParser: true });
-    const docs = await instructor.find({email:email});
-  	let temp = await docs;
-  	const docs2 = await instructor.find({email:email});
-  	let temp2 = await docs;
-  	if (tipo === "instructor")
-  	{
-      //matricula isntructor
-      instructor.create(temporal); 
-  		//return 'none';
-  	}
-  	else
-  	{	
-      //registra
-      if (tipo === "alumno")
-      {
-        student.create(temporal);  
-      }
-      else
-      { 
-        return 'none';
-      }
-  		return 'registrado'; 
-  	}
+    const docs = await user.find({email:email});
+    let temp = await docs;
+    if (temp.length>0){
+      res.send("existe");
+    }
+    else{
+      user.create(temporal);
+      res.send("creado")
+    }
 });
 
 app.post('/admin-get-students', async function(req,res) {
@@ -233,70 +325,6 @@ app.get('/admin-get-students', async function(req,res) {
 //************************ 
 //API -- INSTRUCTOR
 //************************
-app.post('/login-instructor',async function(req,res){
-    console.log('request =' + JSON.stringify(req.body))
-    console.log(req.body);
-    //console.log(res)
-    var user_name=req.body.email;
-    var password=req.body.password;
-
-    console.log("username : " + user_name);
-    console.log("password : " + password);
-    //res.send(user_name+ " -- "+password);
-    //var temp = req.body;
-
-    //mongoose.connect('mongodb://localhost:27017/ilaof', { useNewUrlParser: true });
-    //await instructor.create({ email: 'test-instructor@test.com', clave: '12345' });
-    //await instructor.create({ email: 'test-instructor@test.com', clave: 'dafd' });
-    // Find all customers
-    const g =  run(user_name, password, instructor);
-    let final = await g;
-    console.log(final);
-    if (final.length>0)
-    {
-      //console.log(final);
-      res.send("yes");
-    }
-    else
-    {
-      //console.log(final);
-      res.send("no");
-    }
-});
-
-
-//INSTRUCTOR > registrar cuenta
-app.post('/instructor-register', async function(req,res) {
-  //con 2 campos de clave y su clave repetida de confirmacion
-  var user_name = req.body.email;
-  var password = req.body.password;
-  var password_confirm = req.body.password2;
-  var nombre_completo = req.body.fullname;
-  
-
-  await mongoose.connect('mongodb://localhost:27017/ilaof', { useNewUrlParser: true });
-  const docs = await modelo.find({email:user,clave:pass});// primero busca en la base de datos 
-  let resultado = await docs;
-  if (resultado.length>0)
-  {
-    //ya existe cuenta
-  }
-  else
-  {
-    //procede a registrar datos ... enviar link de confirmacion???
-  }
-
-});
-
-// esquema crear nuevo curso
-const cursoSchema = new mongoose.Schema({
-  nombre_curso: {type: String},
-  status: {type: String},
-  instructor: {type: String},
-  curricula: [{type: String}],
-}, {collection: 'cursos'}); //buscan en ntal coleccion
-
-var curso = mongoose.model('curso', cursoSchema);
 
 app.post('/instructor-create-curso', async function(req,res) {
   var instructorx = req.body.instructor;
@@ -309,7 +337,6 @@ app.post('/instructor-create-curso', async function(req,res) {
   let resultado = await docs;
   //TODO : inserta curso en base de datos
 });
-
 
 ///asdasd
 //{
